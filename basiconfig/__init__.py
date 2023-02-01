@@ -21,8 +21,14 @@ class BasiConfig(object):
 
     def __getitem__(self, item):
         # TODO: dynamic loading of config values from multiple files
+        fd = FlatterDict({}, delimiter=_DELIMITER)
+
         for v in self._config_raw.values():
-            return FlatterDict(v, delimiter=_DELIMITER).get(item)
+            fd.update(FlatterDict(v, delimiter=_DELIMITER))
+
+        result = fd.get(item)
+
+        return result
 
     def __repr__(self):
         """show loaded configuration files"""
