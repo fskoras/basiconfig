@@ -16,12 +16,36 @@ sample.py
 from basiconfig import BasiConfig
 
 bc = BasiConfig(files=["marco_polo.json"])
-marco = bc["Marco"]
 
-print(marco)
+print(bc["Marco"])
 ```
 
 Output:
 ```shell
 Polo
+```
+
+Values Interpolation
+====================
+
+interpolation.json
+```json
+{
+  "name": "Jane",
+  "surname": "Doe",
+  "full_name": "${name} ${surname}"
+}
+```
+
+```python
+from basiconfig import BasiConfig
+
+bc = BasiConfig(files=["interpolation.json"])
+
+print(bc["full_name"])
+```
+
+Output:
+```shell
+Jane Doe
 ```

@@ -1,6 +1,7 @@
 """Configuration management library"""
 
 import os.path
+import re
 from typing import List, Dict, Tuple, Union, Optional, MutableMapping
 from pathlib import Path
 import logging as _log
@@ -9,9 +10,42 @@ from flatdict import FlatterDict
 
 # constants
 _DELIMITER = '.'
+_INTERPOLATION_PATTERN = re.compile("\$\{[\w\.]+\}")
 
 # custom typing
 _PathLike = Union[str, os.PathLike]
+
+
+class BasiConfigError(Exception):
+    ...
+
+
+def _interpolate(d: MutableMapping, k: str):
+
+    # retrieve value
+    val = d.get(k)
+
+    # just return if not a string
+    if not isinstance(val, str):
+        return val
+
+    def _interpolate_util(val: str, d: MutableMapping):
+        for match in _INTERPOLATION_PATTERN.finditer(val):
+            old = match.group(0)
+            key = old.strip(r"${}")
+            new = d.get(key)
+
+            types_allowed = (str, int, float, )
+            if not any(isinstance(new, t) for t in types_allowed):
+                BasiConfigError("Only string or numeric value interpolation allowed")
+
+            new_val = val.replace(old, new)
+            return _interpolate_util(new_val, d)
+        return val
+
+    val = _interpolate_util(val, d)
+
+    return val
 
 
 class BasiConfig(object):
@@ -26,7 +60,8 @@ class BasiConfig(object):
         for v in self._config_raw.values():
             fd.update(FlatterDict(v, delimiter=_DELIMITER))
 
-        result = fd.get(item)
+        # resolve item value interpolation
+        result = _interpolate(fd, item)
 
         return result
 

@@ -16,5 +16,8 @@
       "title": "second message",
       "message": "hello with title"
     }
-  ]
+  ],
+  "name": "Jane",
+  "surname": "Doe",
+  "full_name": "${name} ${surname}"
 }

@@ -1,5 +1,0 @@
-{
-  "name": "Filip",
-  "surname": "Skóraś",
-  "full_name": "${name} ${surname}"
-}
