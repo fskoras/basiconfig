@@ -20,4 +20,4 @@ class TestJsonConfig(unittest.TestCase):
 
     def test_json_config_values(self):
         for k, v in self.input.items():
-            self.assertEqual(self.bc[k], v)
+            self.assertEqual(v, self.bc[k])

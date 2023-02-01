@@ -42,7 +42,7 @@ class BasiConfig(object):
             _log.warning("configuration file does not exist: " + str(file))
             return None
         else:
-            with open(file, mode="r") as fp:
+            with open(file, mode="r", encoding="utf-8") as fp:
                 return Path(file).resolve(), fp.read()
 
     @staticmethod
