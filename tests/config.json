@@ -1,0 +1,20 @@
+{
+  "test_name": "json_config",
+  "details": {
+    "year": 1991,
+    "month": "October",
+    "day": 4
+  },
+  "messages": [
+    {
+      "id": 0,
+      "title": null,
+      "message": "not title in this message"
+    },
+    {
+      "id": 1,
+      "title": "second message",
+      "message": "hello with title"
+    }
+  ]
+}
