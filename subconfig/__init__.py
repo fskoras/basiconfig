@@ -16,7 +16,7 @@ _INTERPOLATION_PATTERN = re.compile("\$\{[\w\.]+\}")
 _PathLike = Union[str, os.PathLike]
 
 
-class BasiConfigError(Exception):
+class SubConfigError(Exception):
     ...
 
 
@@ -37,7 +37,7 @@ def _interpolate(d: MutableMapping, k: str):
 
             types_allowed = (str, int, float, )
             if not any(isinstance(new, t) for t in types_allowed):
-                BasiConfigError("Only string or numeric value interpolation allowed")
+                SubConfigError("Only string or numeric value interpolation allowed")
 
             new_val = val.replace(old, new)
             return _interpolate_util(new_val, d)
@@ -48,7 +48,7 @@ def _interpolate(d: MutableMapping, k: str):
     return val
 
 
-class BasiConfig(object):
+class SubConfig(object):
     def __init__(self, files: List[_PathLike]):
         """configuration files will be loaded in supplied order"""
         self._config_raw: Dict[Path, MutableMapping] = self._load_config_files_raw(files)

@@ -1,5 +1,5 @@
-from basiconfig import BasiConfig
+from subconfig import SubConfig
 
-bc = BasiConfig(files=["interpolation.json"])
+config = SubConfig(files=["interpolation.json"])
 
-print(bc["full_name"])
+print(config["full_name"])

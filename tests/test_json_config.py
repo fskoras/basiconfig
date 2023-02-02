@@ -1,5 +1,5 @@
 import unittest
-from basiconfig import BasiConfig
+from subconfig import SubConfig
 
 
 class TestJsonConfig(unittest.TestCase):
@@ -16,8 +16,8 @@ class TestJsonConfig(unittest.TestCase):
             "messages.1.title": "second message",
             "messages.1.message": "hello with title"
         }
-        self.bc = BasiConfig(["config.json"])
+        self.config = SubConfig(["config.json"])
 
     def test_json_config_values(self):
         for k, v in self.input.items():
-            self.assertEqual(v, self.bc[k])
+            self.assertEqual(v, self.config[k])

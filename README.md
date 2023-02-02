@@ -1,34 +1,38 @@
-basiconfig
-==========
+SubConfig
+=========
 
-Configuration management library for python
+Configuration management library with value substitution for python
 
 Basic Usage
-===========
+-----------
 
-marco_polo.json
+sample.json
+
 ```json
 {"Marco": "Polo"}
 ```
 
 sample.py
+
 ```python
-from basiconfig import BasiConfig
+from subconfig import SubConfig
 
-bc = BasiConfig(files=["marco_polo.json"])
+sc = SubConfig(files=["marco_polo.json"])
 
-print(bc["Marco"])
+print(sc["Marco"])
 ```
 
 Output:
+
 ```shell
 Polo
 ```
 
-Values Interpolation
-====================
+Value Substitution
+------------------
 
 interpolation.json
+
 ```json
 {
   "name": "Jane",
@@ -37,15 +41,18 @@ interpolation.json
 }
 ```
 
-```python
-from basiconfig import BasiConfig
+interpolation.py
 
-bc = BasiConfig(files=["interpolation.json"])
+```python
+from subconfig import SubConfig
+
+bc = SubConfig(files=["interpolation.json"])
 
 print(bc["full_name"])
 ```
 
 Output:
+
 ```shell
 Jane Doe
 ```
