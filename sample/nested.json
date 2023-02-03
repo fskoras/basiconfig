@@ -1,0 +1,4 @@
+{
+  "books": [{"title":  "Little Red Riding Hood"}],
+  "favorite_book": "${books.0.title}"
+}
