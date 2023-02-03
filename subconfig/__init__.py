@@ -39,7 +39,7 @@ def _interpolate(d: MutableMapping, k: str):
             if not any(isinstance(new, t) for t in types_allowed):
                 SubConfigError("Only string or numeric value interpolation allowed")
 
-            new_val = val.replace(old, new)
+            new_val = val.replace(old, str(new))
             return _interpolate_util(new_val, d)
         return val
 
