@@ -49,12 +49,16 @@ def _interpolate(d: MutableMapping, k: str):
 
 
 class SubConfig(object):
-    def __init__(self, files: List[_PathLike]):
+    def __init__(self, files: Union[_PathLike, List[_PathLike]]):
         """configuration files will be loaded in supplied order"""
+
+        # let's be forgiving and support single file input as well
+        if isinstance(files, _PathLike):
+            files = [files]
+
         self._config_raw: Dict[Path, MutableMapping] = self._load_config_files_raw(files)
 
     def __getitem__(self, item):
-        # TODO: dynamic loading of config values from multiple files
         fd = FlatterDict({}, delimiter=_DELIMITER)
 
         for v in self._config_raw.values():
