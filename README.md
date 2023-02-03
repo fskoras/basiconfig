@@ -67,7 +67,7 @@ nested.json
 ```json
 {
   "books": [{"title":  "Little Red Riding Hood"}],
-  ...
+  "favorite_book": "${books.0.title}"
 }
 ```
 
@@ -79,18 +79,8 @@ from subconfig import SubConfig
 sc = SubConfig(["nested.json"])
 
 print(sc["books.0.title"])
-```
 
-Dot notation works for value substitution as well
-
-```json
-{
-  ...
-  "favorite_book": "${books.0.title}"
-}
-```
-
-```python
+# Dot notation works for value substitution as well
 print(sc["favorite_book"])
 ```
 

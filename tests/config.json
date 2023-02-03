@@ -19,5 +19,8 @@
   ],
   "name": "Jane",
   "surname": "Doe",
-  "full_name": "${name} ${surname}"
+  "full_name": "${name} ${surname}",
+  "opened_id": "${messages.1.id}",
+  "opened_title": "${messages.1.title}",
+  "opened_message": "${messages.1.message}"
 }
