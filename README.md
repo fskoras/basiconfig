@@ -17,7 +17,7 @@ sample.py
 ```python
 from subconfig import SubConfig
 
-sc = SubConfig(files=["marco_polo.json"])
+sc = SubConfig(files=["sample.json"])
 
 print(sc["Marco"])
 ```
@@ -60,7 +60,7 @@ Jane Doe
 Nested value access
 -------------------
 
-Structured configuration values ​​can be addressed using dot notation
+Structured configuration values can be addressed using dot notation
 
 nested.json
 
