@@ -61,7 +61,7 @@ class Config:
         self._config: Mapping = FlatterDict(d, delimiter=_DELIMITER)
 
     @property
-    def file(self) -> Path:
+    def file(self) -> Optional[Path]:
         return self._file
 
     @property
@@ -69,7 +69,7 @@ class Config:
         return self._config
 
     @staticmethod
-    def _read_config_file(file: _PathLike) -> Optional[Tuple[Path, str]]:
+    def _read_config_file(file: _PathLike) -> Optional[str]:
         """Check configuration files validity and return (Path, Content) pair"""
 
         if not os.path.exists(file):
@@ -77,13 +77,13 @@ class Config:
             return None
         else:
             with open(file, mode="r", encoding="utf-8") as fp:
-                return Path(file).resolve(), fp.read()
+                return fp.read()
 
     @classmethod
     def from_json_file(cls, p: _PathLike):
-        dummy = cls._read_config_file(p)
-        if dummy:
-            p, s = dummy
+        p = Path(p).resolve()
+        s = cls._read_config_file(p)
+        if s:
             from json import loads
             return cls(loads(s), file=p)
 
@@ -121,6 +121,8 @@ class SubConfig:
         for file in files:
             f = Path(file)
             suffix = f.suffix
+
+            # match file suffix to Config loader
             if suffix.lower() == ".json":
                 store.append(Config.from_json_file(f))
             else:
