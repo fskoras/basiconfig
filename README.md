@@ -31,7 +31,7 @@ Polo
 Value Substitution
 ------------------
 
-interpolation.json
+substitute.json
 
 ```json
 {
@@ -41,14 +41,14 @@ interpolation.json
 }
 ```
 
-interpolation.py
+substitute.py
 
 ```python
 from subconfig import SubConfig
 
-bc = SubConfig(files=["interpolation.json"])
+sc = SubConfig(files=["substitute.json"])
 
-print(bc["full_name"])
+print(sc["full_name"])
 ```
 
 Output:
@@ -87,5 +87,6 @@ print(sc["favorite_book"])
 Output:
 
 ```shell
+Little Red Riding Hood
 Little Red Riding Hood
 ```

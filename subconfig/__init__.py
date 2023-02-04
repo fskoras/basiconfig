@@ -2,7 +2,7 @@
 
 import os.path
 import re
-from typing import List, Dict, Tuple, Union, Optional, MutableMapping
+from typing import List, Tuple, Union, Optional, Mapping, MutableMapping
 from pathlib import Path
 import logging as _log
 
@@ -21,7 +21,12 @@ class SubConfigError(Exception):
 
 
 def _interpolate(d: MutableMapping, k: str):
+    """Resolve item value interpolation
 
+    :param d: configuration dictionary context
+    :param k: key for d value to be resolved
+    :return: expanded value
+    """
     # retrieve value
     val = d.get(k)
 
@@ -30,6 +35,7 @@ def _interpolate(d: MutableMapping, k: str):
         return val
 
     def _interpolate_util(val: str, d: MutableMapping):
+        """Recursive value key resolver"""
         for match in _INTERPOLATION_PATTERN.finditer(val):
             old = match.group(0)
             key = old.strip(r"${}")
@@ -48,34 +54,23 @@ def _interpolate(d: MutableMapping, k: str):
     return val
 
 
-class SubConfig(object):
-    def __init__(self, files: Union[_PathLike, List[_PathLike]]):
-        """configuration files will be loaded in supplied order"""
+class Config:
+    def __init__(self, d: Mapping, file: _PathLike = None):
+        """Abstraction for easier multiple configuration files management"""
+        self._file = Path(file)
+        self._config: Mapping = FlatterDict(d, delimiter=_DELIMITER)
 
-        # let's be forgiving and support single file input as well
-        if isinstance(files, _PathLike):
-            files = [files]
+    @property
+    def file(self) -> Path:
+        return self._file
 
-        self._config_raw: Dict[Path, MutableMapping] = self._load_config_files_raw(files)
-
-    def __getitem__(self, item):
-        fd = FlatterDict({}, delimiter=_DELIMITER)
-
-        for v in self._config_raw.values():
-            fd.update(FlatterDict(v, delimiter=_DELIMITER))
-
-        # resolve item value interpolation
-        result = _interpolate(fd, item)
-
-        return result
-
-    def __repr__(self):
-        """show loaded configuration files"""
-        return f"BasiConfig({[f.name for f in self._config_raw.keys()]})"
+    @property
+    def data(self) -> Mapping:
+        return self._config
 
     @staticmethod
     def _read_config_file(file: _PathLike) -> Optional[Tuple[Path, str]]:
-        """check configuration files validity and return (Path, Content) pair"""
+        """Check configuration files validity and return (Path, Content) pair"""
 
         if not os.path.exists(file):
             _log.warning("configuration file does not exist: " + str(file))
@@ -84,22 +79,51 @@ class SubConfig(object):
             with open(file, mode="r", encoding="utf-8") as fp:
                 return Path(file).resolve(), fp.read()
 
-    @staticmethod
-    def _json_to_dict(s) -> MutableMapping:
-        import json
-        return json.loads(s)
+    @classmethod
+    def from_json_file(cls, p: _PathLike):
+        dummy = cls._read_config_file(p)
+        if dummy:
+            p, s = dummy
+            from json import loads
+            return cls(loads(s), file=p)
 
-    def _load_config_files_raw(self, files: List[_PathLike]) -> Dict[Path, MutableMapping]:
-        """"""
-        store = {}
+
+class SubConfig:
+    def __init__(self, files: Union[_PathLike, List[_PathLike]]):
+        """Configuration files will be loaded in supplied order"""
+
+        # let's be forgiving and support single file input as well
+        if isinstance(files, _PathLike):
+            files = [files]
+
+        self._config: List[Config] = self._load_files_to_config(files)
+
+    def __getitem__(self, item):
+        fd = FlatterDict({}, delimiter=_DELIMITER)
+
+        # join all configurations to allow shared values interpolation between files
+        for config in self._config:
+            fd.update(config.data)
+
+        result = _interpolate(fd, item)
+
+        return result
+
+    def __repr__(self):
+        """Show loaded configuration files"""
+        return f"BasiConfig({[f.file.name for f in self._config]})"
+
+    @staticmethod
+    def _load_files_to_config(files: List[_PathLike]) -> List[Config]:
+        """Internal config files loader"""
+        store = []
 
         for file in files:
-            result = self._read_config_file(file)
-            if result:
-                file, content = result
-
-                if file.suffix.lower() == ".json":
-                    d = self._json_to_dict(content)
-                    store[file] = d
+            f = Path(file)
+            suffix = f.suffix
+            if suffix.lower() == ".json":
+                store.append(Config.from_json_file(f))
+            else:
+                SubConfigError(f"Unsupported file extension: {suffix}. Unable to detect file type: {f.name}")
 
         return store
